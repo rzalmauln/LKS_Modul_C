@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Blade;
 
 Route::get('/', [Controller::class, 'index']);
 Route::post('/cart', [Controller::class, 'hitungJumlah'])->name('hitungJumlah');
+Route::get('/cart/clear', [Controller::class, 'hapusCart'])->name('cart.clear');
+Route::post('/cart/order', [Controller::class, 'order'])->name('order');
 
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate']);

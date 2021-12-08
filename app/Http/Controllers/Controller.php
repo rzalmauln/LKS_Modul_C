@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kirim;
 use App\Models\Order;
 use App\Models\Produk;
+use App\Models\OrderDetail;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -32,6 +33,8 @@ class Controller extends BaseController
     }
 
     public function hitungJumlah(Request $request){
+        
+
         $produk = Produk::find($request->idProduk);
         // dd($produk);
         \Cart::add([
@@ -44,9 +47,45 @@ class Controller extends BaseController
         return redirect()->back()->with('messageCart', 'Produk Berhasil ditambahkan');
     }
 
+    public function order(Request $request){
+        if(Auth::check()){
+
+            $items = \Cart::getContent();
+
+            $order = Order::create([
+                'orderDate' => Carbon::now(),
+                'idUsers' => Auth::id(),
+                'idKirim' => $request->input('paket')
+            ]);
+
+
+            $orderDetail = new orderDetail();
+            
+            foreach ($items as $item) {
+                $orderDetail->jumlahBarang = $item->quantity;
+                $orderDetail->idProduk = $item->id;
+                $orderDetail->idOrder = $order->id;
+                $orderDetail->totalHarga = $request->input('totalHarga');
+            }
+
+            $orderDetail->save();
+
+            \Cart::clear();
+            return redirect()->route('/')->with('messageCheckout', 'Berhasil beli');
+        }else{
+            \Cart::clear();
+            return redirect()->route('login');
+        }
+    }
+
     public function show() {
         $items = \Cart::getContent();
         
         return view('index', compact('items'));
+    }
+
+    public function hapusCart(){
+        \Cart::clear();
+        return redirect()->back();
     }
 }

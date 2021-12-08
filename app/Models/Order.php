@@ -11,6 +11,11 @@ use App\Models\User;
 class Order extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'orderDate',
+        'idCustomer',
+        'idKirim'
+    ];
 
     public function kirim(){
         return $this->belongsTo(Kirim::class,'idKirim','id');
